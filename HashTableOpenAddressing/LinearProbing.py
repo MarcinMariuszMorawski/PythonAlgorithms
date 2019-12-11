@@ -2,67 +2,83 @@ import random
 import matplotlib.pyplot as plot
 
 
-class LinearProbing:
+class KeyValuePair:
+    def __init__(self, key, value, used=True):
+        self.key = key
+        self.value = value
+        self.used = True
 
+
+class LinearProbing:
     def __init__(self):
         self.comparisonOfLastFind = 0
-        self.arraySize = 8
+        self.arraySize = 2
         self.usedCount = 0
-        self.hashArray = [{'used': False} for _ in range(self.arraySize)]
+        self.hashArray = [None for _ in range(self.arraySize)]
 
-    def insert(self, key, value):
-        element, index = self._find(key)
-        if element['used'] is False:
+    def _insert(self, key_value_pair):
+        element, index = self._find_insert(key_value_pair.key)
+        if element is None or element.used is False:
             self.usedCount += 1
-            if 0.90 < self.usedCount / float(self.arraySize):
-                self._resize()
-        self.hashArray[index] = {'key': key, 'value': value, 'used': True}
+        self.hashArray[index] = key_value_pair
+        if 0.90 < self.usedCount / float(self.arraySize):
+            self._resize()
 
-    def delete(self, key):
-        element, index = self._find(key)
-        if element['used'] is True:
+    def _delete(self, key):
+        element, index = self._find_basic(key)
+        if element is not None:
             self.usedCount -= 1
-            self.hashArray[index]['used'] = False
+            self.hashArray[index].used = False
             if 0.25 > self.usedCount / float(self.arraySize):
                 self._resize()
         else:
             raise KeyError("No such key '{0}'!".format(key))
 
-    def find(self, key):
-        element, index = self._find(key)
-        if element['used'] is False:
-            raise KeyError("No such key '{0}'!".format(key))
-        else:
-            return element['key'], element['value']
-
-    def _find(self, key):
-        index = self._get_hash_index(key)
+    def _find_insert(self, key):
+        index = self._get_index_of_key(key)
         self.comparisonOfLastFind = 0
-        while self.hashArray[index]['used'] is True:
+        while True:
             self.comparisonOfLastFind += 1
-            if self.hashArray[index]['key'] == key:
+            if self.hashArray[index] is None or self.hashArray[index].used is False:
                 return self.hashArray[index], index
-            index = self._next_index(index)
-        return self.hashArray[index], index
+            index = (index + 1) % self.arraySize
 
-    def _get_hash_index(self, key):
+    def _find_basic(self, key):
+        index = self._get_index_of_key(key)
+        while True:
+            if self.hashArray[index] is None:
+                return None, index
+            if self.hashArray[index].used is True and self.hashArray[index].key == key:
+                return self.hashArray[index]
+            index = (index + 1) % self.arraySize
+
+    def _get_index_of_key(self, key):
         return hash(key) % self.arraySize
-
-    def _next_index(self, index):
-        return (index + 1) % self.arraySize
 
     def _resize(self):
         old_hash_array = self.hashArray
-        self.arraySize = self.usedCount * 3
+        self.arraySize = self.usedCount * 2
         self.usedCount = 0
-        self.hashArray = [{'used': False} for _ in range(self.arraySize)]
+        self.hashArray = [None for _ in range(self.arraySize)]
         for element in old_hash_array:
-            if element['used'] is True:
-                self.insert(element['key'], element['value'])
+            if element is not None and element.used is True:
+                self._insert(element)
+
+    def insert(self, key, value):
+        self._insert(KeyValuePair(key, value))
+
+    def delete(self, key):
+        self._delete(key)
+
+    def find(self, key):
+        element, index = self._find_basic(key)
+        if element is None:
+            raise KeyError("No such key '{0}'!".format(key))
+        else:
+            return element.key, element.value
 
 
 class HashPlot:
-
     def __init__(self):
         self.listOfElementsCount = []
         self.listOfComparisonCount = []

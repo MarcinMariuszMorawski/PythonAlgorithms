@@ -6,7 +6,6 @@ class KeyValuePair:
     def __init__(self, key, value, psl=0):
         self.key = key
         self.value = value
-        self.hash = hash(key)
         self.psl = psl
 
 
@@ -18,10 +17,9 @@ class RobinHood:
         self.hashArray = [None for _ in range(self.arraySize)]
 
     def insert(self, key_value_pair):
-        key_value_pair.psl = 0
         self.comparisonOfLastInsert = 0
-        index = key_value_pair.hash % self.arraySize
         key_value_pair.psl = 0
+        index = self._get_index_of_key(key_value_pair.key)
         while True:
             index = index % self.arraySize
             self.comparisonOfLastInsert += 1
@@ -42,12 +40,15 @@ class RobinHood:
         if 0.90 < self.usedCount / float(self.arraySize):
             old_hash_array = self.hashArray
             print("Array size: " + str(self.arraySize))
-            self.arraySize = self.arraySize * 2
+            self.arraySize = self.usedCount * 2
             self.usedCount = 0
             self.hashArray = [None for _ in range(self.arraySize)]
             for element in old_hash_array:
                 if element is not None:
                     self.insert(element)
+
+    def _get_index_of_key(self, key):
+        return hash(key) % self.arraySize
 
 
 class HashPlot:
