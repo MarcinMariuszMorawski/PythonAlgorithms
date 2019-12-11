@@ -8,6 +8,12 @@ class KeyValuePair:
         self.value = value
         self.psl = psl
 
+    def __str__(self):
+        return str(self.key) + " " + str(self.value) + " " + str(self.psl)
+
+    def __repr__(self):
+        return str(self.key) + " " + str(self.value) + " " + str(self.psl)
+
 
 class RobinHood:
     def __init__(self):
@@ -16,7 +22,7 @@ class RobinHood:
         self.usedCount = 0
         self.hashArray = [None for _ in range(self.arraySize)]
 
-    def insert(self, key_value_pair):
+    def _insert(self, key_value_pair):
         self.comparisonOfLastInsert = 0
         key_value_pair.psl = 0
         index = self._get_index_of_key(key_value_pair.key)
@@ -30,25 +36,62 @@ class RobinHood:
                 break
             if found_key_value_pair.psl < key_value_pair.psl:
                 self.hashArray[index] = key_value_pair
-                self.insert(found_key_value_pair)
+                self._insert(found_key_value_pair)
                 break
             key_value_pair.psl += 1
             index += 1
-        self._resize()
+        if 0.90 < self.usedCount / float(self.arraySize):
+            self._resize()
+
+    def _delete(self, key):
+        index, element = self._find(key)
+        if element is None:
+            raise KeyError("No such key '{0}'!".format(key))
+        while True:
+            self.hashArray[index] = None
+            next_index = (index + 1) % self.arraySize
+            if self.hashArray[next_index] and self.hashArray[next_index].psl == 0:
+                break
+            self.hashArray[index] = self.hashArray[next_index]
+            if self.hashArray[next_index] is None:
+                break
+            self.hashArray[index].psl -= 1
+            index = next_index
+        self.usedCount -= 1
+
+    def _find(self, key_value_pair):
+        index = self._get_index_of_key(key_value_pair.key)
+        while True:
+            if self.hashArray[index] is None:
+                return None, index
+            if self.hashArray[index].key == key_value_pair.key:
+                return self.hashArray[index], index
+            index = (index + 1) % self.arraySize
 
     def _resize(self):
-        if 0.90 < self.usedCount / float(self.arraySize):
-            old_hash_array = self.hashArray
-            print("Array size: " + str(self.arraySize))
-            self.arraySize = self.usedCount * 2
-            self.usedCount = 0
-            self.hashArray = [None for _ in range(self.arraySize)]
-            for element in old_hash_array:
-                if element is not None:
-                    self.insert(element)
+        print("Array size: " + str(self.arraySize))
+        old_hash_array = self.hashArray
+        self.arraySize = self.usedCount * 2
+        self.usedCount = 0
+        self.hashArray = [None for _ in range(self.arraySize)]
+        for element in old_hash_array:
+            if element is not None:
+                self._insert(element)
 
     def _get_index_of_key(self, key):
         return hash(key) % self.arraySize
+
+    def insert(self, key, value):
+        self._insert(KeyValuePair(key, value))
+
+    def delete(self, key):
+        self._delete(KeyValuePair(key, None))
+
+    def find(self, key):
+        element, index = self._find(KeyValuePair(key, None))
+        if element is None:
+            raise KeyError("No such key '{0}'!".format(key))
+        return element.key, element.value
 
 
 class HashPlot:
@@ -81,7 +124,8 @@ class HashTester:
         my_hash = RobinHood()
         my_plot = HashPlot()
         for _ in range(self.numberOfDraws):
-            my_hash.insert(KeyValuePair(random.randint(1, self.randMaxRange), 1))
+            my_hash.insert(random.randint(1, self.randMaxRange), 1)
+            # print(my_hash.hashArray)
             my_plot.add(my_hash.usedCount, my_hash.comparisonOfLastInsert)
         my_plot.show()
 

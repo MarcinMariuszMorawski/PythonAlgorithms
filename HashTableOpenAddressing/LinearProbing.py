@@ -6,7 +6,13 @@ class KeyValuePair:
     def __init__(self, key, value, used=True):
         self.key = key
         self.value = value
-        self.used = True
+        self.used = used
+
+    def __str__(self):
+        return str(self.key) + " " + str(self.value) + " " + str(self.used)
+
+    def __repr__(self):
+        return str(self.key) + " " + str(self.value) + " " + str(self.used)
 
 
 class LinearProbing:
@@ -26,13 +32,12 @@ class LinearProbing:
 
     def _delete(self, key):
         element, index = self._find_basic(key)
-        if element is not None:
-            self.usedCount -= 1
-            self.hashArray[index].used = False
-            if 0.25 > self.usedCount / float(self.arraySize):
-                self._resize()
-        else:
+        if element is None:
             raise KeyError("No such key '{0}'!".format(key))
+        self.usedCount -= 1
+        self.hashArray[index].used = False
+        if 0.25 > self.usedCount / float(self.arraySize):
+            self._resize()
 
     def _find_insert(self, key):
         index = self._get_index_of_key(key)
@@ -56,6 +61,7 @@ class LinearProbing:
         return hash(key) % self.arraySize
 
     def _resize(self):
+        print("Array size: " + str(self.arraySize))
         old_hash_array = self.hashArray
         self.arraySize = self.usedCount * 2
         self.usedCount = 0
@@ -74,8 +80,7 @@ class LinearProbing:
         element, index = self._find_basic(key)
         if element is None:
             raise KeyError("No such key '{0}'!".format(key))
-        else:
-            return element.key, element.value
+        return element.key, element.value
 
 
 class HashPlot:
@@ -108,6 +113,7 @@ class HashTester:
         my_plot = HashPlot()
         for _ in range(self.numberOfDraws):
             my_hash.insert(random.randint(1, self.randMaxRange), 5)
+            # print(my_hash.hashArray)
             my_plot.add(my_hash.usedCount, my_hash.comparisonOfLastFind)
         my_plot.show()
 
