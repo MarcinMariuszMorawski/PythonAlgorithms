@@ -36,14 +36,14 @@ class LinearProbing:
             raise KeyError("No such key '{0}'!".format(key))
         self.usedCount -= 1
         self.hashArray[index].used = False
-        if 0.25 > self.usedCount / float(self.arraySize):
+        if 0.10 > self.usedCount / float(self.arraySize):
             self._resize()
 
     def _find_insert(self, key):
         index = self._get_index_of_key(key)
         self.comparisonOfLastFind = 0
         while True:
-            self.comparisonOfLastFind += 1
+            self.comparisonOfLastFind += 2
             if self.hashArray[index] is None or self.hashArray[index].used is False:
                 return self.hashArray[index], index
             index = (index + 1) % self.arraySize

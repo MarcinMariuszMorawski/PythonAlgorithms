@@ -34,6 +34,7 @@ class RobinHood:
                 self.hashArray[index] = key_value_pair
                 self.usedCount += 1
                 break
+            self.comparisonOfLastInsert += 1
             if found_key_value_pair.psl < key_value_pair.psl:
                 self.hashArray[index] = key_value_pair
                 self._insert(found_key_value_pair)
@@ -58,6 +59,8 @@ class RobinHood:
             self.hashArray[index].psl -= 1
             index = next_index
         self.usedCount -= 1
+        if 0.10 > self.usedCount / float(self.arraySize):
+            self._resize()
 
     def _find(self, key_value_pair):
         index = self._get_index_of_key(key_value_pair.key)
