@@ -14,7 +14,7 @@ class LinearProbing:
         element, index = self._find(key)
         if element['used'] is False:
             self.usedCount += 1
-            if 0.75 < self.usedCount / float(self.arraySize):
+            if 0.90 < self.usedCount / float(self.arraySize):
                 self._resize()
         self.hashArray[index] = {'key': key, 'value': value, 'used': True}
 
@@ -76,6 +76,7 @@ class HashPlot:
         self.listOfComparisonCount.append(comparison_count)
 
     def show(self):
+        plot.title("Linear Probing")
         plot.plot(self.listOfElementsCount, self.listOfComparisonCount)
         plot.show()
 

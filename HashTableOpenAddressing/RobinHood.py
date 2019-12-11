@@ -2,85 +2,52 @@ import random
 import matplotlib.pyplot as plot
 
 
-class LinearProbing:
+class KeyValuePair:
+    def __init__(self, key, value, psl=0):
+        self.key = key
+        self.value = value
+        self.hash = hash(key)
+        self.psl = psl
 
+
+class RobinHood:
     def __init__(self):
-        self.comparisonOfLastFind = 0
         self.comparisonOfLastInsert = 0
-        self.arraySize = 8
+        self.arraySize = 2
         self.usedCount = 0
         self.hashArray = [None for _ in range(self.arraySize)]
 
-    def insert(self, key, value):
+    def insert(self, key_value_pair):
+        key_value_pair.psl = 0
         self.comparisonOfLastInsert = 0
-        index = self._get_hash_index(key)
-        psl = 0
+        index = key_value_pair.hash % self.arraySize
+        key_value_pair.psl = 0
         while True:
+            index = index % self.arraySize
             self.comparisonOfLastInsert += 1
-            if self.hashArray[index] is None:
-                self.hashArray[index] = (key, value, psl)
+            found_key_value_pair = self.hashArray[index]
+            if found_key_value_pair is None:
+                self.hashArray[index] = key_value_pair
                 self.usedCount += 1
-                if 0.75 < self.usedCount / float(self.arraySize):
-                    self._resize()
                 break
-            else:
-                found_key, found_value, found_psl = self.hashArray[index]
-                if found_psl > psl:
-                    self.hashArray[index] = (key, value, psl)
-                    key = found_key
-                    value = found_value
-                    psl = found_psl
-            index = self._next_index(index)
-            psl += 1
-
-    def delete(self, key):
-        index = self._get_hash_index(key)
-        self.hashArray[index] = None
-        while True:
-            next_index = self._get_hash_index(index)
-            if self.hashArray[next_index] is not None:
-                found_key, found_value, found_psl = self.hashArray[next_index]
-                if found_psl > 0:
-                    found_psl -= 1
-                    self.hashArray[index] = (found_key, found_value, found_psl)
-                    self.hashArray[next_index] = None
-                else:
-                    break
-            else:
+            if found_key_value_pair.psl < key_value_pair.psl:
+                self.hashArray[index] = key_value_pair
+                self.insert(found_key_value_pair)
                 break
-            index = next_index
-
-    def find(self, key):
-        element = self._find(key)
-        if element is None:
-            raise KeyError("No such key '{0}'!".format(key))
-        else:
-            return element[0], element[1]
-
-    def _find(self, key):
-        index = self._get_hash_index(key)
-        self.comparisonOfLastFind = 0
-        while self.hashArray[index] is not None:
-            self.comparisonOfLastFind += 1
-            if self.hashArray[index][0] == key:
-                return self.hashArray[index], index
-            index = self._next_index(index)
-        return self.hashArray[index], index
-
-    def _get_hash_index(self, key):
-        return hash(key) % self.arraySize
-
-    def _next_index(self, index):
-        return (index + 1) % self.arraySize
+            key_value_pair.psl += 1
+            index += 1
+        self._resize()
 
     def _resize(self):
-        old_hash_array = self.hashArray
-        self.arraySize = self.usedCount * 3
-        self.usedCount = 0
-        self.hashArray = [None for _ in range(self.arraySize)]
-        for element in old_hash_array:
-            if element is not None:
-                self.insert(element[0], element[1])
+        if 0.90 < self.usedCount / float(self.arraySize):
+            old_hash_array = self.hashArray
+            print("Array size: " + str(self.arraySize))
+            self.arraySize = self.arraySize * 2
+            self.usedCount = 0
+            self.hashArray = [None for _ in range(self.arraySize)]
+            for element in old_hash_array:
+                if element is not None:
+                    self.insert(element)
 
 
 class HashPlot:
@@ -98,6 +65,7 @@ class HashPlot:
         self.listOfComparisonCount.append(comparison_count)
 
     def show(self):
+        plot.title("Robin Hood")
         plot.plot(self.listOfElementsCount, self.listOfComparisonCount)
         plot.show()
 
@@ -109,10 +77,10 @@ class HashTester:
         self.randMaxRange = rand_max_range
 
     def start(self):
-        my_hash = LinearProbing()
+        my_hash = RobinHood()
         my_plot = HashPlot()
         for _ in range(self.numberOfDraws):
-            my_hash.insert(random.randint(1, self.randMaxRange), 5)
+            my_hash.insert(KeyValuePair(random.randint(1, self.randMaxRange), 1))
             my_plot.add(my_hash.usedCount, my_hash.comparisonOfLastInsert)
         my_plot.show()
 
