@@ -2,7 +2,7 @@ def find(text, pattern):
     comparison_count = 0
     text_length = len(text)
     pattern_length = len(pattern)
-    for i in range(text_length - pattern_length):
+    for i in range(text_length - pattern_length + 1):
         pattern_match = True
         for j in range(len(pattern)):
             comparison_count += 1

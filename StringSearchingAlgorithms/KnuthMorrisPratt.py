@@ -20,7 +20,7 @@ def find(text, pattern):
     kmp_array = transform_pattern(pattern)
     b = 0
     for i, char in enumerate(text):
-        comparison_count+=1
+        comparison_count += 1
         while b > -1 and pattern[b] != char:
             b = kmp_array[b]
         b += 1
