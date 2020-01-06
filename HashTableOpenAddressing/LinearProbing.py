@@ -43,7 +43,7 @@ class LinearProbing:
         index = self._get_index_of_key(key)
         self.comparisonOfLastFind = 0
         while True:
-            self.comparisonOfLastFind += 2
+            self.comparisonOfLastFind += 1
             if self.hashArray[index] is None or self.hashArray[index].used is False:
                 return self.hashArray[index], index
             index = (index + 1) % self.arraySize
@@ -118,7 +118,7 @@ class HashTester:
         my_plot.show()
 
 
-numberOfDraws = 100000
+numberOfDraws = 1000
 randMaxRange = 1000000000000000000
 my_hash_tester = HashTester(numberOfDraws, randMaxRange)
 my_hash_tester.start()

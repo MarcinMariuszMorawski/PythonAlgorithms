@@ -133,7 +133,7 @@ class HashTester:
         my_plot.show()
 
 
-numberOfDraws = 100000
+numberOfDraws = 1000
 randMaxRange = 1000000000000000000
 my_hash_tester = HashTester(numberOfDraws, randMaxRange)
 my_hash_tester.start()
