@@ -16,6 +16,7 @@ def transform_pattern(pattern):
 
 
 def find(text, pattern):
+    found_at_array = []
     comparison_count = 0
     kmp_array = transform_pattern(pattern)
     b = 0
@@ -25,5 +26,5 @@ def find(text, pattern):
             b = kmp_array[b]
         b += 1
         if b == len(pattern):
-            return i - len(pattern) + 1, comparison_count
-    return -1, comparison_count
+            found_at_array.append(i - len(pattern) + 1)
+    return found_at_array, comparison_count

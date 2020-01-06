@@ -2,84 +2,75 @@ from Naive import find as naive
 from SundayQuickSearch import find as sunday
 from KnuthMorrisPratt import find as kmp
 from matplotlib import pyplot as plot
+import string
+import random
 
-text = "taxkikdiaadasdczdatasedtaxqweasdwewaetakxi"
-pattern = "taxi"
+# TEXT LENGTH ---------------------------------------------------------------
+naive_comparison_count_array = []
+sunday_comparison_count_array = []
+kmp_comparison_count_array = []
+text_length_array = []
+for iteration in range(1, 100):
+    pattern = "".join([random.choice(string.letters) for _ in xrange(10)])
+    text = "".join([random.choice(string.letters) for _ in xrange(10 + iteration)]) + pattern
+    naive_comparison_count_array.append(naive(text, pattern)[1])
+    sunday_comparison_count_array.append(sunday(text, pattern)[1])
+    kmp_comparison_count_array.append(kmp(text, pattern)[1])
+    text_length_array.append(len(text))
 
-print(naive(text, pattern))
-print(sunday(text, pattern))
-print(kmp(text, pattern))
-
-text = "AAAAAAAAABB"
-pattern = "BB"
-
-a = []
-b = []
-c = []
-x = []
-for _ in range(50):
-    a.append(naive(text, pattern)[1])
-    b.append(sunday(text, pattern)[1])
-    c.append(kmp(text, pattern)[1])
-    x.append(len(text))
-    plot.plot(x, a, color="blue")
-    plot.plot(x, b, color="orange")
-    plot.plot(x, c, color="lightblue")
-    text = 10 * "A" + text
+plot.plot(text_length_array, naive_comparison_count_array, color="blue")
+plot.plot(text_length_array, sunday_comparison_count_array, color="orange")
+plot.plot(text_length_array, kmp_comparison_count_array, color="red")
+plot.xlabel('Dlugosc tekstu')
+plot.ylabel('Liczba porownan')
 plot.title('Zaleznosc od dlugosci tesktu')
 plot.gca().legend(('Algorytm naiwny', 'Algorytm Sundaya', 'Algorytm KMP'))
 plot.show()
 
-# **********************************************************************************************************************
-# **********************************************************************************************************************
+# PATTERN LENGTH ---------------------------------------------------------------
+naive_comparison_count_array = []
+sunday_comparison_count_array = []
+kmp_comparison_count_array = []
+text_length_array = []
 
-# wykres - dl wzroca
+for iteration in range(1, 100):
+    pattern = "".join([random.choice(string.letters) for _ in xrange(10 + iteration)])
+    text = "".join([random.choice(string.letters) for _ in xrange(500)]) + pattern
+    naive_comparison_count_array.append(naive(text, pattern)[1])
+    sunday_comparison_count_array.append(sunday(text, pattern)[1])
+    kmp_comparison_count_array.append(kmp(text, pattern)[1])
+    text_length_array.append(len(text))
 
-text = 400 * "A" + 200 * "B"
-pattern = 10 * "B"
-a = []
-b = []
-c = []
-x = []
-
-for _ in range(10):
-    a.append(naive(text, pattern)[1])
-    b.append(sunday(text, pattern)[1])
-    c.append(kmp(text, pattern)[1])
-    x.append(len(pattern))
-    plot.plot(x, a, color="blue")
-    plot.plot(x, b, color="orange")
-    plot.plot(x, c, color="lightblue")
-    pattern = pattern + 10 * "B"
-plot.title('Zaleznoxc od dlugosci wzorca')
+plot.clf()
+plot.plot(text_length_array, naive_comparison_count_array, color="blue")
+plot.plot(text_length_array, sunday_comparison_count_array, color="orange")
+plot.plot(text_length_array, kmp_comparison_count_array, color="red")
+plot.xlabel('Dlugosc wzorca')
+plot.ylabel('Liczba porownan')
+plot.title('Zaleznosc od dlugosci wzorca')
 plot.gca().legend(('Algorytm naiwny', 'Algorytm Sundaya', 'Algorytm KMP'))
 plot.show()
 
-# **********************************************************************************************************************
-# **********************************************************************************************************************
+# ALPHABET LENGTH ---------------------------------------------------------------
+naive_comparison_count_array = []
+sunday_comparison_count_array = []
+kmp_comparison_count_array = []
+text_length_array = []
+letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+for iteration in range(2, len(letters)):
+    pattern = "".join([random.choice(letters[0:iteration]) for _ in xrange(10)])
+    text = "".join([random.choice(letters[0:iteration]) for _ in xrange(500)]) + pattern
+    naive_comparison_count_array.append(naive(text, pattern)[1])
+    sunday_comparison_count_array.append(sunday(text, pattern)[1])
+    kmp_comparison_count_array.append(kmp(text, pattern)[1])
+    text_length_array.append(len(text))
 
-# wykres ci alfabetu
-text = "A" + 2 * "B"
-pattern = "BB"
-a = []
-b = []
-d = []
-x = []
-
-asciStart = 67
-alphabetSize = 1
-for c in range(1, 26):
-    a.append(naive(text, pattern)[1])
-    b.append(sunday(text, pattern)[1])
-    d.append(kmp(text, pattern)[1])
-    x.append(alphabetSize)
-
-    plot.plot(x, a, color="blue")
-    plot.plot(x, b, color="orange")
-    plot.plot(x, d, color="lightblue")
-    text = chr(asciStart) + text
-    asciStart += 1
-    alphabetSize += 1
+plot.clf()
+plot.plot(text_length_array, naive_comparison_count_array, color="blue")
+plot.plot(text_length_array, sunday_comparison_count_array, color="orange")
+plot.plot(text_length_array, kmp_comparison_count_array, color="red")
+plot.xlabel('Dlugosc alfabetu')
+plot.ylabel('Liczba porownan')
 plot.title('Zaleznosc od dlugosci alfabetu')
 plot.gca().legend(('Algorytm naiwny', 'Algorytm Sundaya', 'Algorytm KMP'))
 plot.show()

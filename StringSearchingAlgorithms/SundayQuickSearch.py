@@ -1,4 +1,5 @@
 def find(text, pattern):
+    found_at_array = []
     text_length = len(text)
     pattern_length = len(pattern)
     comparison_count = 0
@@ -16,9 +17,10 @@ def find(text, pattern):
             comparison_count += 1
             if pattern[index] != text[p + index]:
                 pattern_match = False
+                break
 
         if pattern_match:
-            return p, comparison_count
+            found_at_array.append(p)
 
         p += pattern_length
 
