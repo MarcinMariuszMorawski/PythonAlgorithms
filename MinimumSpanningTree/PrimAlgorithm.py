@@ -10,7 +10,7 @@ def prim_minimum_spanning_tree(graph, start):
     heap = []
     minimum_spanning_tree = defaultdict(set)
 
-    while visited_count < vertices:
+    while visited_count <= vertices:
         if visited[current] is False:
             visited[current] = True
             for to, length in graph[current].items():
