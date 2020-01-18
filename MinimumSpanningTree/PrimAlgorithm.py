@@ -1,5 +1,5 @@
 from collections import defaultdict
-import heapq
+import BinaryHeap
 
 
 def prim_minimum_spanning_tree(graph, start):
@@ -14,14 +14,14 @@ def prim_minimum_spanning_tree(graph, start):
         if visited[current] is False:
             visited[current] = True
             for to, length in graph[current].items():
-                heapq.heappush(heap, (length, (current, to)))
-            len_of_edge, edge = heapq.heappop(heap)
+                BinaryHeap.heappush(heap, (length, (current, to)))
+            len_of_edge, edge = BinaryHeap.heappop(heap)
             if visited[edge[1]] is False:
                 minimum_spanning_tree[edge[0]].add(edge[1])
             current = edge[1]
             visited_count += 1
         else:
-            len_of_edge, edge = heapq.heappop(heap)
+            len_of_edge, edge = BinaryHeap.heappop(heap)
             if visited[edge[1]] is False:
                 minimum_spanning_tree[edge[0]].add(edge[1])
             current = edge[1]
