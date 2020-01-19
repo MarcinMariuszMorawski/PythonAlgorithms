@@ -8,7 +8,8 @@ example_graph = {
     'C': {'B': 3, 'D': 4, 'F': 2},
     'D': {'C': 4, 'A': 3, 'E': 2, 'F': 4},
     'E': {'A': 2, 'D': 2},
-    'F': {'C': 2, 'D': 4}}
+    'F': {'C': 2, 'D': 4, 'G': 3},
+    'G': {'F': 3}}
 
 minimum_spanning_tree = prim_minimum_spanning_tree(example_graph, 'A')
 
